@@ -3,14 +3,20 @@
     <div class="page-title">
       <h3>{{ title }}</h3>
     </div>
-    <Loader v-if="loading" />
-    <form @submit.prevent="submitHandler" id="add-subject" v-else>
+<!--    <Loader v-if="loading" />-->
+    <button  data-target="add-teacher" class="btn modal-trigger"><i class="material-icons" >add</i></button>
+    <div> <p> {{listSubjects}}</p></div>
+    <div id="add-teacher" class="modal">
+    <form @submit.prevent="submitHandler" v-if="listT.length"
+          :listT = "listT"
+          :key="listT.length + updateCount">
+        <div class='modal-content'>
       <multiselect
-        placeholder="Pick class"
+        placeholder="Select class"
         v-model="value"
         label="name"
         :close-on-select="true"
-        :clear-on-select="false"
+        :clear-on-select="true"
         :multiple="true"
         track-by="name"
         :options="options"
@@ -28,16 +34,16 @@
         :searchable="false"
         @input="handleSelectSubject($event)"
       ></multiselect>
-      <button class="btn waves-effect waves-light" type="submit" id="button">
-        {{ "Додати" }}
+        </div>
+      <button class="btn  waves-effect waves-light" type="submit" id="button">Додати
         <i class="material-icons right">send</i>
       </button>
     </form>
+    </div>
   </div>
 </template>
 <script>
 import firebase from "firebase";
-import { required, minValue } from "vuelidate/lib/validators";
 import Multiselect from "vue-multiselect";
 import M from "materialize-css";
 
@@ -48,6 +54,8 @@ let selectedClassesByTeacher = [];
 let multiselectDataClasses = [];
 let selectDataSubjects = [];
 
+let opt = [];
+let listSub = [];
 
 export default {
   name: "createTeacher",
@@ -55,53 +63,65 @@ export default {
   data: () => ({
     loading: true,
     title: "",
-    options: classesData,
+    options: opt,
     objectOptions: subjectsData,
     value: [],
-    subject: []
+    subject: [],
+    listT: [],
+    listSubjects: listSub,
+    updateCount: 0,
   }),
   async mounted() {
-    console.log(this.$store);
+      var elem = document.querySelectorAll('.modal');
+      var instances = M.Modal.init(elem,null);
     const userData = await this.$store.dispatch(
       "fetchUserById",
       this.$route.params.id
     );
-    this.value = userData.classes;
-    console.dir(userData);
     this.title = userData.title || "";
     this.listT = await this.$store.dispatch("fetchCategories");
     this.select = M.FormSelect.init(this.$refs.select);
     M.updateTextFields();
     this.loading = false;
-
-    // classesData = [];
-    // subjectsData = [];
-    // selectedClassesByTeacher = [];
-
-    const selectedClasses = firebase
-      .database()
-      .ref(`/listT/${this.$route.params.id}/classes`);
+    const selectedClasses = firebase.database().ref(`/listT/${this.$route.params.id}/classes`);
     const classes = firebase.database().ref("classes");
     const subjects = firebase.database().ref("subject");
-
-    classes.on("value", function(snapshot) {
-      snapshot.forEach(function(childSnapshot) {
-        classesData.push(childSnapshot.val());
+    const Sub = firebase.database().ref(`/listT/${this.$route.params.id}/subject/`);
+      Sub.once('value').then(function(snapshot)  {
+          snapshot.forEach(function (childSnapshot) {
+              // listSub.push(childSnapshot.val());
+              listSub =  snapshot.val()|| 'Anonymous';
+          });
       });
-    });
-    subjects.on("value", function(snapshot) {
+      classes.once('value').then(function(snapshot) {
+              snapshot.forEach(function (childSnapshot) {
+                  opt = snapshot.val()|| 'Anonymous';
+                  // opt.push(childSnapshot.val());
+              });
+          // console.log(opt)
+      });
+  
+    // classes.once('value').then(function(snapshot)  {
+      // snapshot.forEach(function(childSnapshot) {
+      //   classesData.push(childSnapshot.val());
+      // });
+     
+    // });
+    subjects.once('value').then(function(snapshot)  {
       snapshot.forEach(function(childSnapshot) {
         subjectsData.push(childSnapshot.val());
       });
     });
-    selectedClasses.on("value", function(snapshot) {
+    selectedClasses.once('value').then(function(snapshot)  {
       snapshot.forEach(function(childSnapshot) {
         selectedClassesByTeacher.push(childSnapshot.val());
       });
     });
   },
-  create: {},
-  methods: {
+  methods : {
+      // updateListT (list) {
+      //     this.updateCount++
+      // },
     async submitHandler() {
       const submitDataClasses = [];
 
@@ -109,10 +129,7 @@ export default {
         submitDataClasses.push({ name })
       );
 
-      await firebase
-        .database()
-        .ref(`/listT/${this.$route.params.id}/subject`)
-        .push({
+      await firebase.database().ref(`/listT/${this.$route.params.id}/subject`).push({
           name: selectDataSubjects,
           classes: submitDataClasses
         });

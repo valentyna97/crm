@@ -29,7 +29,7 @@
           <router-link class="text-list" :to="{ path: `/createTeacher/${list.id}` }">
             {{list.title}}
           </router-link>
-          <button data-target="modal2" class="btn modal-trigger" v-on:click="say(list.id)"><i class="material-icons">Оновити</i></button>
+<!--          <button data-target="modal2" class="btn modal-trigger" v-on:click="say(list.id)"><i class="material-icons">Оновити</i></button>-->
         </div>
 <!--        <p v-else class="center">{{'Списку вчителів ще немає'}}</p>-->
       </div>

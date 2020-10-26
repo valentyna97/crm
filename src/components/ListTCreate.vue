@@ -12,12 +12,12 @@
                         v-model="title"
                         :class="{invalid: $v.title.$dirty && !$v.title.required}"
                 >
-                <label for="name1">Ім"я і прізвище вчителя</label>
+                <label for="name1">{{'Ім"я і прізвище вчителя'}}</label>
                 <span v-if="$v.title.$dirty && !$v.title.required"
                       class="helper-text invalid">{{'Message_CategoryTitle' }}</span>
               </div>
               <button class="btn waves-effect waves-light" type="submit">
-                                Додати
+                                {{'Додати'}}
                                 <i class="material-icons right">send</i>
                               </button>
             </form>
@@ -54,9 +54,13 @@ export default {
       }
       try {
         const list = await this.$store.dispatch('createListT', {
-          title: this.title,  
+          title: this.title,
+          // limit: this.limit,
+          // value: this.value
         });
         this.title = '';
+        // this.limit = 1
+        // this.value=[]
         this.$v.$reset();
         this.$emit('created', list)
           // eslint-disable-next-line no-empty
