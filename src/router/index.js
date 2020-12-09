@@ -1,9 +1,6 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import firebase from 'firebase/app'
-import Admin from '@/views/Admin'
-import Driver from '@/views/Driver'
-import Customer from '@/views/Customer'
 Vue.use(VueRouter);
 
 
@@ -30,19 +27,31 @@ const router = new VueRouter({
       component: () => import("../views/createTeacher.vue")
     },
     {
-      path: '/profile',
-      name: 'profile',
+      path: "/pupils/:id",
+      name: "createPupils",
       meta: { layout: 'main', auth: true },
-      component: () => import('../views/Profile.vue')
+      component: () => import("../views/addPupils.vue")
     },
     {
       path: "/",
+      name: "schedule",
+      meta: { layout: "main", auth: true },
+      component: () => import("../views/scheduleClassesList.vue")
+    },
+    {
+      path: "/schedule",
+      name: "schedule",
+      meta: { layout: "main", auth: true },
+      component: () => import("../views/scheduleClassesList.vue")
+    },
+    {
+      path: "/schedule/:id",
       name: "home",
       meta: { layout: "main", auth: true },
       component: () => import("../views/Home.vue")
     },
     {
-      path: "/teachers",
+      path: "/teachers/",
       name: "teachers",
       meta: { layout: "main", auth: true },
       component: () => import("../views/TeachersList.vue")
@@ -57,70 +66,35 @@ const router = new VueRouter({
       path: "/lists",
       name: "lists",
       meta: { layout: "main", auth: true },
+      component: () => import("../views/ChooseClassForLists.vue")
+    },
+    {
+      path: "/lists/:id",
+      name: "lists",
+      meta: { layout: "main", auth: true },
       component: () => import("../views/List.vue")
     },
     {
-      path: "/notifications",
-      name: "notifications",
+      path: "/HomeTasks",
+      name: "HomeTasks",
       meta: { layout: "main", auth: true },
-      component: () => import("../views/Notifications.vue")
+      component: () => import("../views/HomeTasks.vue")
+    },
+    {
+      path: "/HomeTasks/:id",
+      name: "HomeTasks",
+      meta: { layout: "main", auth: true },
+      component: () => import("../views/HomeTasksForClass.vue")
     },
   ]
 });
-// router.beforeEach((to, from, next) => {
-//   const currentUser = firebase.auth().currentUser
-//   const requireAuth = to.matched.some(record => record.meta.auth)
-//   if (requireAuth && !currentUser) {
-//     next('/login?message=login')
-//   } else {
-//     next()
-//   }
-// })
-
 router.beforeEach((to, from, next) => {
-
-  firebase.auth().onAuthStateChanged(userAuth => {
-
-    if (userAuth) {
-      firebase.auth().currentUser.getIdTokenResult()
-          .then(function ({
-                            claims
-                          }) {
-
-            if (claims.customer) {
-              if (to.path !== '/customer')
-                return next({
-                  path: '/customer',
-                })
-            } else if (claims.admin) {
-              if (to.path !== '/admin')
-                return next({
-                  path: '/admin',
-                })
-            } else if (claims.driver) {
-              if (to.path !== '/driver')
-                return next({
-                  path: '/driver',
-                })
-            }
-
-          })
-    } else {
-      if (to.matched.some(record => record.meta.auth)) {
-        next({
-          path: '/login',
-          query: {
-            redirect: to.fullPath
-          }
-        })
-      } else {
-        next()
-      }
-    }
-
-  })
-
-  next()
-
+  const currentUser = firebase.auth().currentUser
+  const requireAuth = to.matched.some(record => record.meta.auth)
+  if (requireAuth && !currentUser) {
+    next('/login?message=login')
+  } else {
+    next()
+  }
 })
 export default router;

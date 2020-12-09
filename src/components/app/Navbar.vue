@@ -1,17 +1,17 @@
 <template>
-  <nav class="navbar purple lighten-1">
+  <nav class="navbar nav-bg lighten-1">
     <div class="nav-wrapper">
       <div class="navbar-left">
-        <a href="#" @click.prevent="$emit('click')">
-          <i class="material-icons black-text">dehaze</i>
+        <a href="#" @click.prevent="$emit('click')" >
+          <i class="material-icons text-nav">dehaze</i>
         </a>
-        <span class="black-text">{{date}}</span>
+        <span class="text-nav">{{date | date}}</span>
       </div>
 
       <ul class="right hide-on-small-and-down">
         <li>
           <a
-                  class="dropdown-trigger black-text"
+                  class="dropdown-trigger text-nav"
                   href="#"
                   data-target="dropdown"
                   ref="dropdown"
@@ -21,15 +21,10 @@
           </a>
 
           <ul id='dropdown' class='dropdown-content'>
-            <li>
-              <router-link to="/profile" class="black-text">
-                <i class="material-icons">account_circle</i>Профиль
-              </router-link>
-            </li>
             <li class="divider" tabindex="-1"></li>
             <li>
               <a href="#" class="black-text" @click.prevent="logout">
-                <i class="material-icons">assignment_return</i>Выйти
+                <i class="material-icons">assignment_return</i>Вихід
               </a>
             </li>
           </ul>
@@ -50,29 +45,37 @@
         }),
         methods: {
             async logout() {
-                await this.$store.dispatch('logout')
+                await this.$store.dispatch('logout');
                 this.$router.push('/login?message=logout')
             }
         },
         computed: {
             name() {
-                // console.log(this.$store.getters.info.name)
+  
                 return this.$store.getters.info.name
             }
         },
         mounted() {
             this.interval = setInterval(() => {
                 this.date = new Date()
-            }, 1000)
+            }, 1000);
             this.dropdown = M.Dropdown.init(this.$refs.dropdown, {
                 constrainWidth: false
             })
         },
         beforeDestroy() {
-            clearInterval(this.interval)
+            clearInterval(this.interval);
             if (this.dropdown && this.dropdown.destroy) {
                 this.dropdown.destroy()
             }
         }
     }
 </script>
+<style>
+  .text-nav{
+    color: white;
+  }
+  .nav-bg{
+  background: #82b1ff;
+  }
+</style>

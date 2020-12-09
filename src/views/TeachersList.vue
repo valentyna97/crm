@@ -3,7 +3,7 @@
     <div class="page-title">
       <h3>Список вчителів</h3>
       <!-- Modal Trigger -->
-      <button data-target="modal1" class="btn modal-trigger"><i class="material-icons">add</i></button>
+      <div v-if="this.$store.getters.info.isAdmin"><button data-target="modal1" class="btn modal-trigger"><i class="material-icons">add</i></button></div>
       <!-- Modal Structure -->
       <div id="modal1" class="modal">
         <a href="#!" class="modal-close waves-effect waves-green btn-flat"> <i class=" close material-icons">close</i></a>
@@ -14,31 +14,36 @@
       <!-- Modal Structure -->
       <div id="modal2" class="modal">
         <a href="#!" class="modal-close waves-effect waves-green btn-flat"> <i class=" close material-icons">close</i></a>
-        <ListTEdit
-                v-if="listT.length"
-                :listT = "listT"
-                :key="listT.length + updateCount"
-                @updated="updateListT"
-                @delete="removeElement"
-        />
+      
       </div>
       
       <Loader v-if="loading"/>
       <div class="row" v-else>
-        <div v-for="list in listT" :key="list.title" v-on:click="name(list.id)">
+        <div v-if="this.$store.getters.info.isAdmin">
+        <div v-for="list in listT" :key="list.title" v-on:click="name(list.id)" class="teacher-list">
           <router-link class="text-list" :to="{ path: `/createTeacher/${list.id}` }">
-            {{list.title}}
+            {{list.fullName}}
           </router-link>
-<!--          <button data-target="modal2" class="btn modal-trigger" v-on:click="say(list.id)"><i class="material-icons">Оновити</i></button>-->
+          <button class="btn" v-on:click="removeTeacher(list.id)"> <i class="material-icons right">delete</i></button>
         </div>
+        </div>
+         </div>
+         <div class="row" v-if="!this.$store.getters.info.isAdmin">
+         <div v-for="list in listT" :key="list.title" v-on:click="name(list.id)" class="teacher-list">
+          <router-link class="text-list" :to="{ path: `/createTeacher/${list.id}` }">
+            {{list.fullName}}
+          </router-link>
+        </div>
+         </div>
 <!--        <p v-else class="center">{{'Списку вчителів ще немає'}}</p>-->
-      </div>
     </section>
   </div>
 </template>
 <script>
+
+ 
     import ListTCreate from '@/components/ListTCreate'
-    import ListTEdit from '@/components/ListTEdit'
+
     import M from 'materialize-css'
     import firebase from "firebase";
     export default {
@@ -47,8 +52,8 @@
             current: null,
             listT: [],
             classT: [],
-            loading: true,
-            updateCount: 0
+            title: '',
+            loading: true
         }),
         async mounted () {
             this.listT = await this.$store.dispatch('fetchCategories')
@@ -57,36 +62,53 @@
             var instances = M.Modal.init(elems,null);
         },
         components: {
-            ListTCreate,
-            ListTEdit
+            ListTCreate
         },
         methods: {
             addNewCategory (list) {
                 this.listT.push(list)
             },
-            updateListT (list) {
-                const idx = this.listT.findIndex(c => c.id === list.id)
-                this.listT[idx].title = list.title
-                this.listT[idx].limit = list.limit
-                this.listT[idx].value = list.value
-                this.updateCount++
-            },
-            removeElement(list) {
-                this.listT.reset(list)
-            },
             name(id) {
                 var list = firebase.database().ref(`/listT/` + id);
                 id=list.key
+            },
+             async removeTeacher(id){
+                 await this.$store.dispatch(
+                    "removeTeacherFromList",
+                    {
+                        teacherID: id,
+                    }
+                );
+                 this.$message('Ви видалили вчителя')
+                this.listT = await this.$store.dispatch('fetchCategories')
             }
         }
     }
 </script>
 <style scoped>
+.modal{
+  height: 400px;
+}
+  .btn{
+    background-color: #82b1ff;
+  }
+  
+  .btn:hover, .btn-large:hover, .btn-small:hover{
+    background-color: #82b1ff;
+  }
   .text-list{
     margin-bottom: 20px;
   }
   .modal-close {
     position: absolute;
     right: 0;
+  }
+  .teacher-list{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+  i{
+    margin-left: 0;
   }
 </style>

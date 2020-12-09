@@ -1,7 +1,7 @@
 <template>
   <form class="card auth-card" @submit.prevent="submitHandler">
     <div class="card-content">
-      <span class="card-title">Адміністративна панель</span>
+      <span class="card-title">Інформаційна система для підтримки дистанційного навчання</span>
       <div class="input-field">
         <input
           id="email"
@@ -23,7 +23,7 @@
         <small
           class="helper-text invalid"
           v-else-if="$v.email.$dirty && !$v.email.email"
-          >{{ "Message_EmailValid" }}</small
+          >Введіть емейл</small
         >
       </div>
       <div class="input-field">
@@ -37,7 +37,7 @@
               ($v.password.$dirty && !$v.password.minLength)
           }"
         />
-        <label for="password">{{ "Password" }}</label>
+        <label for="password">Пароль</label>
         <small
           class="helper-text invalid"
           v-if="$v.password.$dirty && !$v.password.required"
@@ -53,16 +53,14 @@
       </div>
     </div>
     <div class="card-action">
-      <div>
         <button class="btn waves-effect waves-light auth-submit" type="submit">
-          {{ "Login" }}
+          Вхід
           <i class="material-icons right">send</i>
         </button>
-      </div>
 
       <p class="center">
-        {{ "NoAccount" }}
-        <router-link to="/register">{{ "Register" }}</router-link>
+       Немає акаунту? Зверніться до вашого адміністратора
+<!--         <router-link to="/register">Register</router-link>-->
       </p>
     </div>
   </form>
@@ -103,88 +101,33 @@ export default {
       };
       try {
         await this.$store.dispatch("login", formData);
-        this.$router.push("/");
+
+        await this.$router.push("/");
+
         // eslint-disable-next-line no-empty
       } catch (e) {}
     }
   }
 };
 </script>
-<!--<template>-->
-<!--  <div class="ui middle aligned center aligned grid">-->
-<!--    <div class="column">-->
-<!--      <form class="ui large form">-->
-<!--        <div class="ui stacked secondary segment">-->
-<!--          <div class="field">-->
-<!--            <div class="ui left icon input large">-->
-<!--              <i class="user icon"></i>-->
-<!--              <input-->
-<!--                      type="text"-->
-<!--                      name="email"-->
-<!--                      placeholder="E-mail address"-->
-<!--                      v-model="email"-->
-<!--              />-->
-<!--            </div>-->
-<!--          </div>-->
-<!--          <div class="field">-->
-<!--            <div class="ui left icon input large">-->
-<!--              <i class="lock icon"></i>-->
-<!--              <input-->
-<!--                      type="password"-->
-<!--                      name="password"-->
-<!--                      placeholder="Password"-->
-<!--                      v-model="password"-->
-<!--              />-->
-<!--            </div>-->
-<!--          </div>-->
-<!--          <div class="ui fluid large teal submit button" @click="loginButtonPressed">Login</div>-->
-<!--        </div>-->
+<style scoped>
+@media (max-width: 768px) {
+ form{
+    width: 300px;
+  }
+}
+   .btn{
+    background-color: #82b1ff;
+    display: flex;
+    margin-top: 10px;
 
-<!--        <div class="ui error message"></div>-->
-<!--      </form>-->
+  }
 
-<!--      <div class="ui message">-->
-<!--        Don't have an account?-->
-<!--        <router-link :to="{ name: 'register' }">Register</router-link>-->
-<!--        &lt;!&ndash; <button @click="signOut">SignOut</button> &ndash;&gt;-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
-<!--</template>-->
-
-<!--<script>-->
-<!--    import firebase from "firebase";-->
-<!--    export default {-->
-<!--        data() {-->
-<!--            return {-->
-<!--                email: "",-->
-<!--                password: ""-->
-<!--            };-->
-<!--        },-->
-<!--        created() {-->
-<!--            firebase.auth().onAuthStateChanged(userAuth => {-->
-<!--                if (userAuth) {-->
-<!--                    firebase-->
-<!--                        .auth()-->
-<!--                        .currentUser.getIdTokenResult()-->
-<!--                        .then(tokenResult => {-->
-<!--                            console.log(tokenResult.claims);-->
-<!--                        });-->
-<!--                }-->
-<!--            });-->
-<!--        },-->
-<!--        methods: {-->
-<!--            async loginButtonPressed() {-->
-<!--                try {-->
-<!--                    const {-->
-<!--                        user-->
-<!--                    } = await firebase-->
-<!--                        .auth()-->
-<!--                        .signInWithEmailAndPassword(this.email, this.password);-->
-<!--                } catch (error) {-->
-<!--                    console.log(error);-->
-<!--                }-->
-<!--            }-->
-<!--        }-->
-<!--    };-->
-<!--</script>-->
+  .btn:hover, .btn-large:hover, .btn-small:hover{
+    background-color: #82b1ff;
+  }
+ .btn{
+       display: flex;
+    justify-content: center;
+ }
+</style>
